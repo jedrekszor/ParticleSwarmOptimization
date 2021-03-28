@@ -1,0 +1,577 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc}   
+\usepackage{hyperref}       
+\usepackage{url}           
+\usepackage{booktabs}       
+\usepackage{amsfonts}       
+\usepackage{amsmath}  
+\usepackage{nicefrac}      
+\usepackage{microtype}      
+\usepackage{lipsum}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{indentfirst}
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{pgfplots}
+\usepackage{adjustbox}
+\geometry{
+    a4paper,
+    left=25mm,
+    right=25mm,
+    top=25mm,
+    bottom=25mm
+}
+
+\begin{document}
+\author{Jędrzej Szor 239716}
+\title{\text{Obliczenia ewolucyjne}\\\textbf{Implementacja algorytmu PSO}}
+\maketitle
+
+\section{Opis zastosowanych współczynników i propozycji}
+\subsection{Współczynniki stałe}
+Przedstawione wartości współczynników zostały zaproponowane w oparciu o artykuł \cite{parameters}.
+\begin{itemize}
+    \item $w = 0.3,\quad c1, c2 = 1$,
+    \item $w = 0.3,\quad c1, c2 = 2$,
+    \item $w = 0.6,\quad c1, c2 = 1$,
+    \item $w = 0.6,\quad c1, c2 = 2$
+\end{itemize}
+\subsection{Współczynniki zmienne (TVAC)}
+Współczynniki zmienne zmniejszają się liniowo pomiędzy wartością maksymalną i minimalną w różnych kierunkach dla różnych parametrów \cite{tvac}. Powoduje to bardziej globalny charakter przeszukiwania na początku biegu algorytmu i lokalny charakter pod koniec. Ze względu na tą metodę, warunkiem zatrzymania algorytmu musi być ilość iteracji.
+\begin{gather}
+    wt = wt_{min} + (wt_{max} - wt_{min})\frac{(t_{max} - t)}{t_{max}},\\
+    c_1 = (c_{1f} - c_{1i})\frac{t}{t_{max}} + c_{1i},\\
+    c_2 = (c_{2f} - c_{2i})\frac{t}{t_{max}} + c_{2i}
+\end{gather}
+
+\subsection{Propozycja zmiany równania prędkości}
+
+\section{Analiza wpływu parametrów przyspieszenia na charakterystykę przebiegu algorytmu}
+Wszystkie eksperymenty w niniejszej sekcji wykonane zostały dla 30 cząstek dla funkcji sfery:
+\begin{gather}
+    f_R = \sum_{i=1}^n x_i^2,\\
+    gdzie\; x\in(-100, 100),\; n=20
+\end{gather}
+
+% \begin{equation}
+%     f_{R} = \sum_{i=1}^n (x_i^2 -10cos(2\pi x_i)),
+%     \label{eq:rastrigin}
+% \end{equation}\
+
+\subsection{Współczynniki stałe}
+W tej sekcji warunkiem zatrzymania algorytmu jest precyzja $|f_R(x) - f_R(x_min)| \leq 0.0001$ lub przekroczenie 10 000 iteracji.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex1.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{$c1,c2=1$, 10 000 iteracji, końcowa wartość:~3032.7788}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex2.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{$c1,c2=2$, 243 iteracje, końcowa wartość:~0.00009}
+    \end{subfigure}
+    \caption{Wykresy przebiegu algorytmu dla $w=0.3\;$.}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex3.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{$c1,c2=1$, 10 000 iteracji, końcowa wartość:~171.53}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex4.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{$c1,c2=2$, 695 iteracji, końcowa wartość: 0.00009}
+    \end{subfigure}
+    \caption{Wykresy przebiegu algorytmu dla $w=0.6\;$.}
+\end{figure}
+
+\subsection{Współczynniki zmienne (TVAC)}
+W tej sekcji algorytm wykonuje się przez 500 iteracji niezależnie od wyników. Wartości początkowe i końcowe dla współczynników to:
+\begin{itemize}
+    \item $w_{init} = 0.9,\; w_{final} = 0.4$
+    \item $c_{1init} = 2,\; c_{1final} = 1$
+    \item $c_{2init} = 1,\; c_{2final} = 2$
+\end{itemize}
+\begin{figure}[H]
+    \centering
+    \begin{adjustbox}{width=0.6\linewidth}
+    \begin{tikzpicture}
+        \begin{axis}[grid=both,
+                    grid style={solid,gray!30!white},
+                    axis lines=middle,
+                    xlabel={Iteracja},
+                    ylabel={Błąd},
+                    x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                    y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                    ]
+        \addplot table [
+            mark = none,
+            blue,
+            x=Step, y=Value,
+            col sep=comma] {plots/ex5.csv};
+        \end{axis}
+    \end{tikzpicture}
+\end{adjustbox}
+    \caption{Wykresy przebiegu algorytmu dla zmiennych wartości współczynników przyspieszenia. 1000 iteracji, końcowa wartość: 0.000008}
+\end{figure}
+
+Na podstawie wyników można zauważyć, że najlepsze wyniki dla współczynników stałych osiągane są, gdy parametr $w$ jest mniejszy, a parametry $c_1$ oraz $c_2$ są większe. Oznacza to, że algorytm jest efektywniejszy, gdy prędkości kognitywne i społeczne są ważniejsze niż prędkość własna. w związku z tym, cząstki bardziej podążają w kierunku najlepszych osiągniętych wyników a mniej błądzą w przypadkowych kierunkach.
+
+Zmienne współczynniki przyspieszenia zapewniają bardziej metodyczne przeszukiwanie. Jak widać na wykresach, największe różnice w wartościach widoczne są na początku. Po kilku iteracjach wykres się wypłaszcza i osiągnięcie mniejszych wyników zajmuje coraz więcej czasu. Zmienne przyspieszenie wzmacnia ten efekt pozwalając na większe skoki na początku i coraz mniejsze im bardziej algorytm zbliża się do minimum.
+
+\section{Wyniki przebiegu algorytmu dla różnych funkcji}
+W nawiązaniu do poprzedniej sekcji, przy przeprowadzaniu poniższych eksperymentów zdecydowałem się użyć najlepszej według mnie wersji, tj. zmiennych współczynników przyspieszenia. W związku z tym wyborem, każdy eksperyment trwał 300 iteracji.
+Każda funkcja przetestowana została na zasugerowanym w instrukcji przedziale.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex6.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 20, końcowy wynik: $1.28$}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex7.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 50, końcowy wynik: $8.89\cdot 10^{-7}$}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex8.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 100, końcowy wynik: $8.53\cdot 10^{-11}$}
+    \end{subfigure}
+    \caption{Wykresy przebiegu algorytmu dla funkcji sfery dla $x\in(-100,100)$ dla 20 wymiarów.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex9.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 20, końcowy wynik: $17.87$}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex10.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 50, końcowy wynik: $16.25$}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex11.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 100, końcowy wynik: $14.01$}
+    \end{subfigure}
+    \caption{Wykresy przebiegu algorytmu dla funkcji Rosenbrocka dla $x\in(-2.048,2.048)$.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex12.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 20, końcowy wynik: $43.81$}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex13.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 50, końcowy wynik: $42.78$}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex14.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 100, końcowy wynik: $40.79$}
+    \end{subfigure}
+    \caption{Wykresy przebiegu algorytmu dla funkcji Rastrigina dla $x\in(-5.12,5.12)$.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex15.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 20, końcowy wynik: $2.72\cdot 10^{-3}$}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex16.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 50, końcowy wynik: $1.74\cdot 10^{-4}$}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex17.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 100, końcowy wynik: $8.92\cdot 10^{-10}$}
+    \end{subfigure}
+    \caption{Wykresy przebiegu algorytmu dla funkcji Browna dla $x\in(-4,4)$.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex18.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 20, końcowy wynik: $0$}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex19.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 50, końcowy wynik: $0$}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \begin{adjustbox}{width=\linewidth}
+        \begin{tikzpicture}
+            \begin{axis}[grid=both,
+                        grid style={solid,gray!30!white},
+                        axis lines=middle,
+                        xlabel={Iteracja},
+                        ylabel={Błąd},
+                        x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+                        y label style={at={(axis description cs:-0.2,0.5)},anchor=south},
+                        ]
+            \addplot table [
+                mark = none,
+                blue,
+                x=Step, y=Value,
+                col sep=comma] {plots/ex20.csv};
+            \end{axis}
+        \end{tikzpicture}
+        \end{adjustbox}
+        \caption{Populacja 100, końcowy wynik: $0$}
+    \end{subfigure}
+    \caption{Wykresy przebiegu algorytmu dla funkcji Corany dla $x\in(-1000,1000)$ dla 4 wymiarów.}
+\end{figure}
+
+\section{Porównanie wyników algorytmu PSO i algorytmu GA}
+Porównanie zostało przeprowadzone dla wyników GA z pracy \cite{comparison} oraz parametrów PSO z tego samego dokumentu dla maksymalnej wiarygodności otrzymanych wyników. W ostatnim rzędzie przedstawione są wartości dla algorytmu PSO ze zmiennymi wartościami współczynników przyspieszenia.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        &\textbf{Sfera}&\textbf{Rastrigin}\\
+        \hline
+        \textbf{PSO}&$6.22$&$285.09$\\
+        \hline
+        \textbf{GA}&$0.0008$&$0.05$\\
+        \hline
+        \textbf{PSO TVAC}&$1.75\cdot 10^{-11}$&$30.84$\\
+    \end{tabular}
+    \caption{Porównanie wyników algorytmu PSO i GA.}
+\end{table}
+
+\bibliographystyle{plain}
+\bibliography{references.bib}
+\end{document}

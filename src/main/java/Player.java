@@ -25,8 +25,11 @@ public class Player {
 
     private void updateVel() {
         for (int i = 0; i < coordinates.size(); i++) {
-            float cognitiveVelocity = Config.c1 * Config.r1 * (best.get(i) - coordinates.get(i));
-            float socialVelocity = Config.c2 * Config.r2 * (Main.best.get(i) - coordinates.get(i));
+            Random rand = new Random();
+            float r1 = rand.nextFloat();
+            float r2 = rand.nextFloat();
+            float cognitiveVelocity = Config.c1 * r1 * (best.get(i) - coordinates.get(i));
+            float socialVelocity = Config.c2 * r2 * (Main.best.get(i) - coordinates.get(i));
             velocity.set(i, Config.w * velocity.get(i) + cognitiveVelocity + socialVelocity);
         }
     }

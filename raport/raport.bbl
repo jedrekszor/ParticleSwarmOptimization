@@ -1,0 +1,23 @@
+\begin{thebibliography}{1}
+
+\bibitem{parameters}
+A.~Kumar, S.~Pant, M.~Ram, and S.B. Singh.
+\newblock 6 - on solving complex reliability optimization problem using
+  multi-objective particle swarm optimization.
+\newblock In Mangey Ram and J.~{Paulo Davim}, editors, {\em Mathematics Applied
+  to Engineering}, pages 115--131. Academic Press, 2017.
+
+\bibitem{comparison}
+Seng~Poh Lim and Habibollah Haron.
+\newblock Performance comparison of genetic algorithm, differential evolution
+  and particle swarm optimization towards benchmark functions.
+\newblock pages 41--46, 12 2013.
+
+\bibitem{tvac}
+Hui ling Chen, Bo~Yang, Su~jing Wang, Gang Wang, Da~you Liu, Huai zhong Li, and
+  Wen bin Liu.
+\newblock Towards an optimal support vector machine classifier using a parallel
+  particle swarm optimization strategy.
+\newblock {\em Applied Mathematics and Computation}, 239:180--197, 2014.
+
+\end{thebibliography}
